@@ -25,20 +25,10 @@ def calculate_top_for_gic(result = calculate_tops(), selected_gic=None):
     result = csv_df[csv_df[TOP_FLAG].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
     gic_counts = result[GIC].value_counts()
     
-    if selected_gic == None:
-        for gic, count in gic_counts.items():
-                if count >= 3:
-                    print(f"{gic}: {count}")
-    else:
-         for gic, count in gic_counts.items():
-                if gic == selected_gic:
-                    if count >= 3:
-                        print(f"{gic}: {count}")
+    for gic, count in gic_counts.items():
+        if (selected_gic is None or gic == selected_gic) and count >= 3:
+            print(f"{gic}: {count}")
          
-
-
-
-
-calculate_top_for_gic(selected_gic='TRS_KAIZEN')
+calculate_top_for_gic()
 
 
