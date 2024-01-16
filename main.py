@@ -9,22 +9,36 @@ csv_df = pd.read_csv(file_path, delimiter=',')
 # print(f'Number of prontos: {pronto_count}')
 
 #Column Definition
-gic = 'Group in Charge'
-top_flag = 'Top Importance'
-pronto = 'Pronto ID'
+GIC = 'Group in Charge'
+TRIBE = 'Tribe of Group in Charge'
+TOP_FLAG = 'Top Importance'
+PRONTO = 'Pronto ID'
 
-top_flag_value = 'ABIP'
+TOP_FLAG_VALUE = 'TOP1_24R'
 
-result = csv_df[csv_df[top_flag].str.contains(top_flag_value, na=False, case=False)]
-print(result[gic])
+def calculate_tops():
+    result = csv_df[csv_df[TOP_FLAG].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
+    return result
+    
 
-gic_counts = result[gic].value_counts()
+def calculate_top_for_gic(result = calculate_tops(), selected_gic=None):
+    result = csv_df[csv_df[TOP_FLAG].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
+    gic_counts = result[GIC].value_counts()
+    
+    if selected_gic == None:
+        for gic, count in gic_counts.items():
+                if count >= 3:
+                    print(f"{gic}: {count}")
+    else:
+         for gic, count in gic_counts.items():
+                if gic == selected_gic:
+                    if count >= 3:
+                        print(f"{gic}: {count}")
+         
 
-# Print the result
-for gic, count in gic_counts.items():
-    print(f"{gic}: {count}")
 
 
 
+calculate_top_for_gic(selected_gic='TRS_KAIZEN')
 
 
