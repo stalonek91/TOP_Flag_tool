@@ -12,7 +12,7 @@ label = tk.Label(window, text="Select an option:")
 label.grid(row=0, column=0, pady=5)
 
 label_file_path = tk.Label(window, text="Selected file from: ")
-label_file_path.grid(row=1, column=1, pady=5)
+label_file_path.grid(row=1, column=1, pady=5, columnspan=3)
 
 label_for_confirmation = tk.Label(window, text=f'test')
 label_for_confirmation.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
@@ -28,7 +28,12 @@ selected_option.set(options[0])
 #Combobox
 combobox_items = None
 combobox = ttk.Combobox(window, values=combobox_items)
-combobox.grid(column=1, row=3, padx=5, pady=5)
+combobox.grid(column=1, row=3, padx=5, pady=5, sticky='w')
+
+#Button
+button_gic = tk.Button(window, text='Load data')
+button_gic['state'] = 'disabled'
+button_gic.grid(column=2, row=3, sticky='w')
 
 # Global var
 csv_df = None
@@ -69,10 +74,11 @@ def show_frontline():
 
 def show_items_combobox():
     global combobox_items
-    
+
     result = csv_df[csv_df[TOP_FLAG].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
     gic_set = set(result[GIC].unique())
     combobox['values'] = sorted(gic_set)
+    button_gic['state'] = 'normal'
 
 
 # Execute option commands
