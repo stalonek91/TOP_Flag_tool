@@ -56,13 +56,28 @@ def calculate_generic_view():
         else:
              flattened_list.append(item)
 
-        
-    
     combobox_gic.configure(values=gic_sorted)
-    print(f'PRINTING TOPs: {flattened_list[1]} type: {type(flattened_list[1])}')
+    print(f'{gic_sorted}')
     combobox_tops.configure(values=flattened_list)
 
-    
+    calculate_tops_per_gic()
+
+
+def calculate_tops_per_gic():
+     global global_csv_df
+
+     pr_group = 'BOAM_BTS_CORE_PROC'
+     result = global_csv_df[global_csv_df[GIC] == pr_group]
+     result['TOP_format'] = result[TOP_FLAG_COLUMN].str.extract(r'(TOP\d*)')
+     top_flag_counts = result['TOP_format'].value_counts()
+
+     print(f" Counts for DCS: ")
+     for top_flag, count in top_flag_counts.items():
+          print(f"{pr_group} has {count} : {top_flag}")
+
+
+     
+     
     
 
 button_load_file = CTkButton(master=app, text='Load csv file', command=select_file)
