@@ -7,7 +7,7 @@ GIC = 'Group in Charge'
 TRIBE = 'Tribe of Group in Charge'
 TOP_FLAG_COLUMN = 'Top Importance'
 PRONTO = 'Pronto ID'
-TOP_FLAG_VALUE = 'TOP1_'
+TOP_FLAG_VALUE = 'TOP1_24R2-SR_ST'
 
 global_csv_df = None
 
@@ -44,15 +44,23 @@ def calculate_generic_view():
     gic_set = set(result[GIC].unique())
     gic_sorted = sorted(gic_set)
 
-    top_set = set(result[TOP_FLAG_COLUMN].unique())
-    print(top_set)
+    top_set = list(result[TOP_FLAG_COLUMN].unique())
+    
+    flattened_list = list()
 
+    for item in top_set:
+        if isinstance(item, list):
+            flattened_list.extend(item)
+        elif isinstance(item, str) and ',' in item:
+             flattened_list.extend(item.split(', '))
+        else:
+             flattened_list.append(item)
 
-
+        
     
     combobox_gic.configure(values=gic_sorted)
-    print(f'PRINTING TOPs: {top_set}')
-    combobox_tops.configure(values=top_set)
+    print(f'PRINTING TOPs: {flattened_list[1]} type: {type(flattened_list[1])}')
+    combobox_tops.configure(values=flattened_list)
 
     
     
