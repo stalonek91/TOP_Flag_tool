@@ -10,6 +10,7 @@ PRONTO = 'Pronto ID'
 TOP_FLAG_VALUE = 'TOP1_24R2-SR_ST'
 
 global_csv_df = None
+selected_gic = None
 
 app = CTk()
 app.geometry("600x400")
@@ -57,17 +58,22 @@ def calculate_generic_view():
              flattened_list.append(item)
 
     combobox_gic.configure(values=gic_sorted)
-    print(f'{gic_sorted}')
+    print(f" DEBUG: values added to combobox gic: {gic_sorted}")
     combobox_tops.configure(values=flattened_list)
+    print(f" DEBUG: values added to combobox top: {flattened_list}")
 
-    calculate_tops_per_gic()
+    
 
 
 def calculate_tops_per_gic():
-    global global_csv_df
+    global global_csv_df, selected_gic
 
-    pr_group = 'BOAM_BTS_CORE_PROC'
-    result = global_csv_df[global_csv_df[GIC] == pr_group]
+    if not selected_gic:
+         print(f" GIC NOT SELECTED")
+         return
+
+    
+    result = global_csv_df[global_csv_df[GIC] == selected_gic]
     result['TOP_format'] = result[TOP_FLAG_COLUMN].str.extract(r'(TOP\d*)')
     top_flag_counts = result['TOP_format'].value_counts()
 
@@ -76,15 +82,21 @@ def calculate_tops_per_gic():
     for top_flag, count in top_flag_counts.items():
         top_counts[top_flag] = count
     
-    print(f"TOP count for {pr_group}: ")
+    print(f"TOP count for {selected_gic}: ")
     for top_flag, count in top_counts.items():
          print(f" {top_flag} = {count}")
     
 
+def on_gic_select(event):
+    global selected_gic
+    selected_gic = combobox_gic.get()
+    print(f"Selected GIC: {selected_gic}")  # Debugging print statement
 
 
-
-     
+def update_selected_gic(event=None):
+     global selected_gic
+     selected_gic = combobox_gic.get()
+     print(f"Selected GIC: {selected_gic}")
      
     
 
@@ -94,12 +106,15 @@ button_load_file.grid(column=0, row=0, padx=5, pady=5, sticky='w')
 button_calculate = CTkButton(master=app, text="Calculate TOP's", command=calculate_generic_view, state='disabled')
 button_calculate.grid(column=0, row=1, padx=5, pady=5, sticky='w')
 
+button_calculate_top_gic = CTkButton(master=app, text="Calculate TOP/GIC count", command=calculate_tops_per_gic)
+button_calculate_top_gic.grid(column=3, row=4, padx=5, pady=5, sticky='w')
 
 combobox_tops = CTkComboBox(master=app, values=['Waiting for TOP flags'])
 combobox_tops.grid(column=3, row=2, sticky='n')
 
-combobox_gic = CTkComboBox(master=app, values=['Waiting for GIC'])
+combobox_gic = CTkComboBox(master=app, values=['Waiting for GIC'], command=update_selected_gic)
 combobox_gic.grid(column=3, row=3, sticky='n')
+combobox_gic.bind("<<ComboboxSelected>>", on_gic_select)
 
 label1 = CTkLabel(master=frame_top, text='Number of TOP1 prontos in metrics: ', text_color='black')
 label1.grid(row=0, column=0, pady=5, sticky='w')
