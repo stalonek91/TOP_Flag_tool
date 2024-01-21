@@ -64,16 +64,24 @@ def calculate_generic_view():
 
 
 def calculate_tops_per_gic():
-     global global_csv_df
+    global global_csv_df
 
-     pr_group = 'BOAM_BTS_CORE_PROC'
-     result = global_csv_df[global_csv_df[GIC] == pr_group]
-     result['TOP_format'] = result[TOP_FLAG_COLUMN].str.extract(r'(TOP\d*)')
-     top_flag_counts = result['TOP_format'].value_counts()
+    pr_group = 'BOAM_BTS_CORE_PROC'
+    result = global_csv_df[global_csv_df[GIC] == pr_group]
+    result['TOP_format'] = result[TOP_FLAG_COLUMN].str.extract(r'(TOP\d*)')
+    top_flag_counts = result['TOP_format'].value_counts()
 
-     print(f" Counts for DCS: ")
-     for top_flag, count in top_flag_counts.items():
-          print(f"{pr_group} has {count} : {top_flag}")
+    top_counts = {}
+
+    for top_flag, count in top_flag_counts.items():
+        top_counts[top_flag] = count
+    
+    print(f"TOP count for {pr_group}: ")
+    for top_flag, count in top_counts.items():
+         print(f" {top_flag} = {count}")
+    
+
+
 
 
      
