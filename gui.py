@@ -7,7 +7,7 @@ GIC = 'Group in Charge'
 TRIBE = 'Tribe of Group in Charge'
 TOP_FLAG_COLUMN = 'Top Importance'
 PRONTO = 'Pronto ID'
-TOP_FLAG_VALUE = 'TOP1_24R2-SR_ST'
+TOP_FLAG_VALUE = 'TOP'
 
 global_csv_df = None
 selected_gic = None
@@ -72,7 +72,6 @@ def calculate_tops_per_gic():
          print(f" GIC NOT SELECTED")
          return
 
-    
     result = global_csv_df[global_csv_df[GIC] == selected_gic]
     result['TOP_format'] = result[TOP_FLAG_COLUMN].str.extract(r'(TOP\d*)')
     top_flag_counts = result['TOP_format'].value_counts()
@@ -85,7 +84,13 @@ def calculate_tops_per_gic():
     print(f"TOP count for {selected_gic}: ")
     for top_flag, count in top_counts.items():
          print(f" {top_flag} = {count}")
+        
+    label1.configure(text=f" Count of TOP1:{top_counts['TOP1']}")
+    label2.configure(text=f" Count of TOP2:{top_counts['TOP2']}")
+    label3.configure(text=f" Count of TOP3:{top_counts['TOP3']}")
     
+
+
 
 def on_gic_select(event):
     global selected_gic
@@ -97,6 +102,8 @@ def update_selected_gic(event=None):
      global selected_gic
      selected_gic = combobox_gic.get()
      print(f"Selected GIC: {selected_gic}")
+
+
      
     
 
@@ -125,8 +132,7 @@ label2.grid(row=1, column=0, pady=5)
 label3 = CTkLabel(master=frame_top, text='% of TOP1_program prontos in Tribe:', text_color='black')
 label3.grid(row=2, column=0, pady=5)
 
-label4 = CTkLabel(master=frame_top, text='% of all TOP1 in Tribe ', text_color='black')
-label4.grid(row=3, column=0, pady=5, sticky='w')
+
 
 
 
