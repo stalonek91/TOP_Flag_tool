@@ -5,9 +5,11 @@ import os
 #Column Definition
 GIC = 'Group in Charge'
 TRIBE = 'Tribe of Group in Charge'
-TOP_FLAG = 'Top Importance'
+TOP_FLAG_COLUMN = 'Top Importance'
 PRONTO = 'Pronto ID'
 TOP_FLAG_VALUE = 'TOP1_'
+
+global_csv_df = None
 
 app = CTk()
 app.geometry("600x400")
@@ -26,22 +28,34 @@ label_file_path.grid(column=1, row=0, sticky='w')
 
 
 def select_file():
+    global global_csv_df
     file_path = filedialog.askopenfilename(title='Select a file',filetypes=[("CSV files", "*.csv")])
     file_path_output = os.path.join(os.path.basename(os.path.dirname(file_path)), os.path.basename(file_path))
     if file_path:
-            csv_df = pd.read_csv(file_path, delimiter=',')
+            global_csv_df = pd.read_csv(file_path, delimiter=',')
             label_file_path.configure(text=f"{file_path_output}", text_color='green')
             button_calculate.configure(state='normal')
-    return csv_df
+
         
 
-def calculate_generic_view(data=None):
-    if data is None:
-         data = select_file()
-    result = data[data[TOP_FLAG].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
+def calculate_generic_view():
+    global global_csv_df
+    result = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
     gic_set = set(result[GIC].unique())
     gic_sorted = sorted(gic_set)
-    print(gic_sorted)
+
+    top_set = set(result[TOP_FLAG_COLUMN].unique())
+    print(top_set)
+
+
+
+    
+    combobox_gic.configure(values=gic_sorted)
+    print(f'PRINTING TOPs: {top_set}')
+    combobox_tops.configure(values=top_set)
+
+    
+    
 
 button_load_file = CTkButton(master=app, text='Load csv file', command=select_file)
 button_load_file.grid(column=0, row=0, padx=5, pady=5, sticky='w')
@@ -50,10 +64,10 @@ button_calculate = CTkButton(master=app, text="Calculate TOP's", command=calcula
 button_calculate.grid(column=0, row=1, padx=5, pady=5, sticky='w')
 
 
-combobox_tops = CTkComboBox(master=app, values=['TOP1', 'TOP2', 'TOP3'])
+combobox_tops = CTkComboBox(master=app, values=['Waiting for TOP flags'])
 combobox_tops.grid(column=3, row=2, sticky='n')
 
-combobox_gic = CTkComboBox(master=app, values=['gic1', 'gic2', 'gic3'])
+combobox_gic = CTkComboBox(master=app, values=['Waiting for GIC'])
 combobox_gic.grid(column=3, row=3, sticky='n')
 
 label1 = CTkLabel(master=frame_top, text='Number of TOP1 prontos in metrics: ', text_color='black')
