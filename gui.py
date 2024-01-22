@@ -59,10 +59,10 @@ def calculate_generic_view():
         else:
              flattened_list.append(item)
 
-    # combobox_gic.configure(values=gic_sorted)
-    # print(f" DEBUG: values added to combobox gic: {gic_sorted}")
-    # combobox_tops.configure(values=flattened_list)
-    # print(f" DEBUG: values added to combobox top: {flattened_list}")
+    combobox_gic.configure(values=gic_sorted)
+
+    combobox_tops.configure(values=flattened_list)
+
 
     #Count of all Prontos:
     prontos_count = global_csv_df[PRONTO].count()
@@ -106,14 +106,7 @@ def calculate_generic_view():
     print(global_csv_df[TOP_FLAG_COLUMN].head(10))
     
 
-    """
-    New functionality to be added:
-    Number of all Prontos: 1200
-    Number of Prontos with TOP1 label: 230 | 24%
 
-    
-    """  
-    
 
 
 def calculate_tops_per_gic():
