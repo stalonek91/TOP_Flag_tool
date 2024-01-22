@@ -1,6 +1,10 @@
 from customtkinter import *
 import pandas as pd
 import os
+import logging
+
+#Logging config
+logging.basicConfig(level=logging.INFO)
 
 #Column Definition
 GIC = 'Group in Charge'
@@ -30,18 +34,27 @@ label_file_path.grid(column=1, row=0, sticky='w')
 
 
 def select_file():
+    logging.info(f"Function SELECT_FILE started")
+
+
     global global_csv_df
     file_path = filedialog.askopenfilename(title='Select a file',filetypes=[("CSV files", "*.csv")])
+    logging.info(f"Opend Finder for CSV file")
+
     file_path_output = os.path.join(os.path.basename(os.path.dirname(file_path)), os.path.basename(file_path))
     if file_path:
+            logging.info(f"File SELECTED SUCCESFULY")
             global_csv_df = pd.read_csv(file_path, delimiter=',')
             label_file_path.configure(text=f"{file_path_output}", text_color='green')
+            logging.info(f"Label changed for FILE PATH")
             button_calculate.configure(state='normal')
 
 
 
 
 def calculate_generic_view():
+    logging.info(f"Function CALCULATE_GENERIC_VIEW started")
+
     global global_csv_df
     result = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains(TOP_FLAG_VALUE, na=False, case=False)]
     gic_set = set(result[GIC].unique())
@@ -60,8 +73,8 @@ def calculate_generic_view():
              flattened_list.append(item)
 
     combobox_gic.configure(values=gic_sorted)
-
     combobox_tops.configure(values=flattened_list)
+    logging.info(f"Comboboxes updated with values")
 
 
     #Count of all Prontos:
@@ -98,22 +111,18 @@ def calculate_generic_view():
 
     top_none_count = prontos_count - (top1_count + top2_count + top3_count)
     perc_top_none = (top_none_count / prontos_count) * 100
-
-
- 
     label4.configure(text=f"Number non TOP prontos: {top_none_count} which is: {perc_top_none:.2f}% of all Prontos  ")
 
-    print(global_csv_df[TOP_FLAG_COLUMN].head(10))
-    
-
+    logging.info(f'Generic view created')
 
 
 
 def calculate_tops_per_gic():
+    logging.info(f'calculate_tops_per_gic fuction started')
     global global_csv_df, selected_gic
 
     if not selected_gic:
-         print(f" GIC NOT SELECTED")
+         logging.error('GIC not selected')
          return
 
     result = global_csv_df[global_csv_df[GIC] == selected_gic]
@@ -124,15 +133,21 @@ def calculate_tops_per_gic():
 
     for top_flag, count in top_flag_counts.items():
         top_counts[top_flag] = count
+
+    top_keys = ['TOP1', 'TOP2', 'TOP3']
+    labels = [label1, label2, label3]
     
-    print(f"TOP count for {selected_gic}: ")
-    for top_flag, count in top_counts.items():
-         print(f" {top_flag} = {count}")
-        
-    label1.configure(text=f" Count of TOP1:{top_counts['TOP1']}")
-    label2.configure(text=f" Count of TOP2:{top_counts['TOP2']}")
-    label3.configure(text=f" Count of TOP3:{top_counts['TOP3']}")
+    print(f'Print count for selected GIC')
+    for top_key, label in zip(top_keys, labels):
+         count = top_counts.get(top_key, 0)
+         print(f' {top_key} = {count}')
+         label.configure(text=f"Count of {top_key}: {count}")
+         logging.info(f'Updated label for {top_key} with count {count}')
+
+
     
+
+    logging.info(f'updated labels for TOP"s')
 
 
 
@@ -160,10 +175,10 @@ button_calculate.grid(column=0, row=1, padx=5, pady=5, sticky='w')
 button_calculate_top_gic = CTkButton(master=app, text="Calculate TOP/GIC count", command=calculate_tops_per_gic)
 button_calculate_top_gic.grid(column=3, row=4, padx=5, pady=5, sticky='w')
 
-combobox_tops = CTkComboBox(master=app, values=['Waiting for TOP flags'])
+combobox_tops = CTkComboBox(master=app, values=['--'])
 combobox_tops.grid(column=3, row=2, sticky='n')
 
-combobox_gic = CTkComboBox(master=app, values=['Waiting for GIC'], command=update_selected_gic)
+combobox_gic = CTkComboBox(master=app, values=['--'], command=update_selected_gic)
 combobox_gic.grid(column=3, row=3, sticky='n')
 combobox_gic.bind("<<ComboboxSelected>>", on_gic_select)
 
