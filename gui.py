@@ -22,6 +22,7 @@ set_default_color_theme('blue')
 
 frame_top = CTkFrame(master=app, fg_color='white', width=400, height=300)
 frame_top.grid(column=0, row=2, padx=5, pady=5, columnspan=3, sticky='w', rowspan=6)
+frame_top.propagate(False)
 
 label_file_path = CTkLabel(master=app, text=f"File location: ")
 label_file_path.grid(column=1, row=0, sticky='w')
@@ -37,7 +38,8 @@ def select_file():
             label_file_path.configure(text=f"{file_path_output}", text_color='green')
             button_calculate.configure(state='normal')
 
-        
+
+
 
 def calculate_generic_view():
     global global_csv_df
@@ -57,11 +59,60 @@ def calculate_generic_view():
         else:
              flattened_list.append(item)
 
-    combobox_gic.configure(values=gic_sorted)
-    print(f" DEBUG: values added to combobox gic: {gic_sorted}")
-    combobox_tops.configure(values=flattened_list)
-    print(f" DEBUG: values added to combobox top: {flattened_list}")
+    # combobox_gic.configure(values=gic_sorted)
+    # print(f" DEBUG: values added to combobox gic: {gic_sorted}")
+    # combobox_tops.configure(values=flattened_list)
+    # print(f" DEBUG: values added to combobox top: {flattened_list}")
 
+    #Count of all Prontos:
+    prontos_count = global_csv_df[PRONTO].count()
+    label1.configure(text=f"Number of prontos: {prontos_count}   ")
+
+    #Count of all TOP1 prontos
+    top1_count = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains('TOP1_', na=False)]
+    top1_count = top1_count[TOP_FLAG_COLUMN].count()
+    
+    perc_top1 = (top1_count / prontos_count) * 100
+ 
+    label2.configure(text=f"Number TOP1: {top1_count} which is: {perc_top1:.2f}% of all Prontos  ")
+
+    #Count of TOP2 prontos 
+
+    top2_count = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains('TOP2_', na=False)]
+    top2_count = top2_count[TOP_FLAG_COLUMN].count()
+    
+    perc_top2 = (top2_count / prontos_count) * 100
+ 
+    label3.configure(text=f"Number TOP2: {top2_count} which is: {perc_top2:.2f}% of all Prontos  ")
+
+    #Count of TOP3 prontos 
+
+    top3_count = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains('TOP3_', na=False)]
+    top3_count = top3_count[TOP_FLAG_COLUMN].count()
+    
+    perc_top3 = (top3_count / prontos_count) * 100
+ 
+    label4.configure(text=f"Number TOP3: {top3_count} which is: {perc_top3:.2f}% of all Prontos  ")
+
+    #Count of NON TOP prontos 
+
+    top_none_count = prontos_count - (top1_count + top2_count + top3_count)
+    perc_top_none = (top_none_count / prontos_count) * 100
+
+
+ 
+    label4.configure(text=f"Number non TOP prontos: {top_none_count} which is: {perc_top_none:.2f}% of all Prontos  ")
+
+    print(global_csv_df[TOP_FLAG_COLUMN].head(10))
+    
+
+    """
+    New functionality to be added:
+    Number of all Prontos: 1200
+    Number of Prontos with TOP1 label: 230 | 24%
+
+    
+    """  
     
 
 
@@ -123,14 +174,20 @@ combobox_gic = CTkComboBox(master=app, values=['Waiting for GIC'], command=updat
 combobox_gic.grid(column=3, row=3, sticky='n')
 combobox_gic.bind("<<ComboboxSelected>>", on_gic_select)
 
-label1 = CTkLabel(master=frame_top, text='Number of TOP1 prontos in metrics: ', text_color='black')
-label1.grid(row=0, column=0, pady=5, sticky='w')
+label1 = CTkLabel(master=frame_top, text='', text_color='black')
+label1.grid(row=0, column=0, pady=5)
 
-label2 = CTkLabel(master=frame_top, text='% of TOP1_program prontos in GIC:', text_color='black')
+label2 = CTkLabel(master=frame_top, text='', text_color='black')
 label2.grid(row=1, column=0, pady=5)
 
-label3 = CTkLabel(master=frame_top, text='% of TOP1_program prontos in Tribe:', text_color='black')
+label3 = CTkLabel(master=frame_top, text='', text_color='black')
 label3.grid(row=2, column=0, pady=5)
+
+label4 = CTkLabel(master=frame_top, text='', text_color='black')
+label4.grid(row=3, column=0, pady=5)
+
+label5 = CTkLabel(master=frame_top, text='', text_color='black')
+label5.grid(row=4, column=0, pady=5)
 
 
 
