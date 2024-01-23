@@ -50,7 +50,7 @@ def select_file():
             logging.info(f"Label changed for FILE PATH")
             button_calculate.configure(state='normal')
 
-            calculate_tops_in_tribes()
+            
 
 
 
@@ -76,7 +76,11 @@ def calculate_generic_view():
              flattened_list.append(item)
 
     combobox_gic.configure(values=gic_sorted)
-    # combobox_tops.configure(values=flattened_list)
+    
+    #Create tribe lists
+    uniqe_tribes_list = global_csv_df[TRIBE].unique().tolist()
+    combobox_tops.configure(values=uniqe_tribes_list)
+
     logging.info(f"Comboboxes updated with values")
 
 
@@ -158,9 +162,7 @@ def calculate_tops_per_gic():
 def calculate_tops_in_tribes():
     global global_csv_df
 
-    #Create tribe lists
-    uniqe_tribes_list = global_csv_df[TRIBE].unique().tolist()
-    combobox_tops.configure(values=uniqe_tribes_list)
+    
 
     #Create tribe - all pronto count mapping
     pronto_counts_per_tribe = global_csv_df.groupby(TRIBE)[PRONTO].count().sort_values(ascending=False)
@@ -197,6 +199,17 @@ def update_selected_gic(event=None):
      selected_gic = combobox_gic.get()
      print(f"Selected GIC: {selected_gic}")
 
+def on_tribe_select(event):
+    global selected_tribe
+    selected_tribe = combobox_tops.get()
+    print(f"Selected Tribe: {selected_tribe}")  # Debugging print statement
+
+
+def update_selected_tribe(event=None):
+     global selected_tribe
+     selected_tribe = combobox_tops.get()
+     print(f"Selected Tribe: {selected_tribe}")
+
 
      
     
@@ -207,11 +220,12 @@ button_load_file.grid(column=0, row=0, padx=5, pady=5, sticky='w')
 button_calculate = CTkButton(master=app, text="Calculate TOP's", command=calculate_generic_view, state='disabled')
 button_calculate.grid(column=0, row=1, padx=5, pady=5, sticky='w')
 
-button_calculate_top_gic = CTkButton(master=app, text="Calculate TOP/GIC count", command=calculate_tops_per_gic)
+button_calculate_top_gic = CTkButton(master=app, text="Calculate Tribe/GIC count", command=calculate_tops_per_gic)
 button_calculate_top_gic.grid(column=3, row=4, padx=5, pady=5, sticky='w')
 
-combobox_tops = CTkComboBox(master=app, values=['--'])
+combobox_tops = CTkComboBox(master=app, values=['--'], command=update_selected_tribe)
 combobox_tops.grid(column=3, row=2, sticky='n')
+combobox_tops.bind("<<ComboboxSelected>>", on_tribe_select)
 
 combobox_gic = CTkComboBox(master=app, values=['--'], command=update_selected_gic)
 combobox_gic.grid(column=3, row=3, sticky='n')
