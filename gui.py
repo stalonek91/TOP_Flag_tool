@@ -15,6 +15,7 @@ TOP_FLAG_VALUE = 'TOP'
 
 global_csv_df = None
 selected_gic = None
+selected_tribe = None
 
 app = CTk()
 app.geometry("600x400")
@@ -49,6 +50,8 @@ def select_file():
             logging.info(f"Label changed for FILE PATH")
             button_calculate.configure(state='normal')
 
+            calculate_tops_in_tribes()
+
 
 
 
@@ -73,7 +76,7 @@ def calculate_generic_view():
              flattened_list.append(item)
 
     combobox_gic.configure(values=gic_sorted)
-    combobox_tops.configure(values=flattened_list)
+    # combobox_tops.configure(values=flattened_list)
     logging.info(f"Comboboxes updated with values")
 
 
@@ -151,6 +154,38 @@ def calculate_tops_per_gic():
 
 
 
+
+def calculate_tops_in_tribes():
+    global global_csv_df
+
+    #Create tribe lists
+    uniqe_tribes_list = global_csv_df[TRIBE].unique().tolist()
+    combobox_tops.configure(values=uniqe_tribes_list)
+
+    #Create tribe - all pronto count mapping
+    pronto_counts_per_tribe = global_csv_df.groupby(TRIBE)[PRONTO].count().sort_values(ascending=False)
+
+    #Create tribe - PR - TOP mapping
+    pattern = r'TOP[123]_.*'
+    filtered_top_tribe_count = global_csv_df[global_csv_df[TOP_FLAG_COLUMN].str.contains(pattern, na=False)]
+    filtered_tribes = filtered_top_tribe_count[[PRONTO, TRIBE, TOP_FLAG_COLUMN]]
+  
+
+    # Define a custom function to count occurrences of TOP1*, TOP2*, and TOP3*
+    def count_top_patterns(group):
+        top1_count = group[group[TOP_FLAG_COLUMN].str.contains(r'TOP1_.*', na=False)].shape[0]
+        top2_count = group[group[TOP_FLAG_COLUMN].str.contains(r'TOP2_.*', na=False)].shape[0]
+        top3_count = group[group[TOP_FLAG_COLUMN].str.contains(r'TOP3_.*', na=False)].shape[0]
+        return pd.Series({'TOP1': top1_count, 'TOP2': top2_count, 'TOP3': top3_count})
+
+    # Group by TRIBE and apply the custom function
+    summary_df = filtered_tribes.groupby(TRIBE).apply(count_top_patterns).reset_index()
+
+    
+    label4.configure(text=f'{summary_df.loc[summary_df[TRIBE] == "MN BB&SoC RD TRSVTC"]}')
+
+
+
 def on_gic_select(event):
     global selected_gic
     selected_gic = combobox_gic.get()
@@ -191,7 +226,7 @@ label2.grid(row=1, column=0, pady=5)
 label3 = CTkLabel(master=frame_top, text='', text_color='black')
 label3.grid(row=2, column=0, pady=5)
 
-label4 = CTkLabel(master=frame_top, text='', text_color='black')
+label4 = CTkLabel(master=frame_top, text='sss', text_color='black')
 label4.grid(row=3, column=0, pady=5)
 
 label5 = CTkLabel(master=frame_top, text='', text_color='black')
